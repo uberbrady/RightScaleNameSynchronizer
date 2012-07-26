@@ -74,12 +74,6 @@ def update_servers(server_list)
       server_settings = JSON.parse(resp.body)
       aws_id = server_settings['aws_id']
 
-      #ec2conn = which_ec2_conn(server_settings['cloud_id'])
-      #ec2conn.instances.each do |instance|
-      #  puts "#{instance.id}"
-      #end
-
-
       # Write the tag on the server 
       which_ec2_conn(server_settings['cloud_id']).instances[aws_id].tag("Name", :value => server['nickname'])
     end
