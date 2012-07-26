@@ -55,10 +55,10 @@ end
 
 def which_ec2_conn(rs_cloud_id)
       case rs_cloud_id 
-      when '1'
+      when 1
         ec2conn = @ec2
-      when '3'
-        ec2conn = @ec2_cal
+      when 3
+        ec2conn = @ec2.regions['us-west-1']
       else
         ec2conn = @ec2
       end
@@ -72,13 +72,16 @@ def update_servers(server_list)
     if server['state'] == "operational"
       resp = @api_conn.get(server['href'].sub(/^.*servers/, "/servers") + "/current/settings")
       server_settings = JSON.parse(resp.body)
-       server_settings['cloud_id']
       aws_id = server_settings['aws_id']
 
-      ec2conn = which_ec2_conn(server_settings['cloud_id'])
+      #ec2conn = which_ec2_conn(server_settings['cloud_id'])
+      #ec2conn.instances.each do |instance|
+      #  puts "#{instance.id}"
+      #end
+
 
       # Write the tag on the server 
-      ec2conn.instances[aws_id].tag("Name", :value => server['nickname'])
+      which_ec2_conn(server_settings['cloud_id']).instances[aws_id].tag("Name", :value => server['nickname'])
     end
   end
 end
@@ -90,21 +93,20 @@ begin
 
 
   @ec2 = AWS::EC2.new  # Connects to us-east-1
-  @ec2_cal = @ec2.regions['us-west-1']
-
 
   resp = @api_conn.get("/servers")
-#puts resp.code  # Response code from RightScale
-#puts resp.body
   server_list = JSON.parse(resp.body)
 
-  #update_servers(server_list)
+  update_servers(server_list)
 
 
-  resp = @api_conn.get("/server_arrays")
-  server_arrays = JSON.parse(resp.body)
-  puts "Updating Array Servers"
-  puts server_arrays
+  # This is broken until I add a bunch of try and catches as the rightscale api
+  # is a bit broken when it comes to server arrays.
+
+  #  resp = @api_conn.get("/server_arrays")
+#  server_arrays = JSON.parse(resp.body)
+#  puts "Updating Array Servers"
+#  puts server_arrays
 #
 #  server_arrays.each do |server_array|
 #    puts server_array
