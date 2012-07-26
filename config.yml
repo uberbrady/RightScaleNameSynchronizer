@@ -1,0 +1,6 @@
+  username: 'somevalue'
+  password: 'somepass'
+  account_id: 44210
+  base64: false # If you encode your username and pass in base 64 set to true
+  access_key_id: <access_key>
+  secret_access_key: <access_pass>
